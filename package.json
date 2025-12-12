@@ -1,0 +1,13 @@
+{
+  "name": "euler-oracles-scraper",
+  "version": "1.0.0",
+  "description": "Scraper for Euler Finance oracle data",
+  "main": "scrape-euler-oracles.js",
+  "scripts": {
+    "scrape": "node scrape-euler-oracles.js",
+    "analyze": "node analyze-vendors.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.6.1"
+  }
+}
