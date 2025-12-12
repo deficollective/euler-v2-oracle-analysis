@@ -5,9 +5,11 @@
   "main": "scrape-euler-oracles.js",
   "scripts": {
     "scrape": "node scrape-euler-oracles.js",
-    "analyze": "node analyze-vendors.js"
+    "analyze": "node analyze-vendors.js",
+    "analyze-cross": "node analyze-cross-oracles.js"
   },
   "dependencies": {
-    "puppeteer": "^21.6.1"
+    "puppeteer": "^21.6.1",
+    "ethers": "^6.9.0"
   }
 }

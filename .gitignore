@@ -8,10 +8,13 @@ yarn-error.log*
 euler-oracles.json
 euler-oracles.csv
 scrape-progress.json
+cross-oracle-progress.json
 
 # Analysis output files
 vendor-analysis.json
 vendor-analysis.csv
+cross-oracle-analysis.json
+cross-oracle-analysis.csv
 
 # Debug files
 debug-page*.png
