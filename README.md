@@ -65,28 +65,60 @@ npm run analyze
 - Chronicle
 - Midas
 - MEV Capital
-- Cross
+- Cross (wrapper - excluded from combined %)
 - Fixed Rate
 - Rate Provider
 - Lido Fundamental
-- Other (everything else)
+- Resolv
+- Idle
+- Other (uncategorized oracles)
 
 **Outputs:**
 - `vendor-analysis.json` - Detailed statistics and breakdowns
-- `vendor-analysis.csv` - Market share table for spreadsheets
+- `vendor-analysis.csv` - Market share table with direct, underlying, and combined percentages
+- `unknown-oracles.json` - List of uncategorized oracles (if any)
+- `unknown-oracles.csv` - Spreadsheet format of uncategorized oracles
+
+**Features:**
+- **Direct Usage**: Counts oracles used directly in the system
+- **Underlying Usage**: Counts oracle providers used within Cross adapters
+- **Combined %**: Total market share excluding Cross (which is a wrapper)
+- **Uncategorized Tracking**: Automatically exports oracles that couldn't be categorized
 
 **Example Output:**
 ```
 --- Vendor Market Share ---
 Total Valid Oracles: 580
+Cross Oracles Analyzed: 148
+Total Underlying Oracles: 296
 
 Target Vendors:
-  Cross            150 (25.86%) █████████████
-  Pendle            94 (16.21%) ████████
-  Pyth              89 (15.34%) ████████
-  Chainlink         87 (15.00%) ████████
+  Vendor             Direct   Underlying  Total Combined %
+  ----------------- ------   ----------- ------ -----------
+  Chainlink         87 (15.00%)   124 (41.89%)    211      29.07%
+  Pendle            94 (16.21%)    69 (23.31%)    163      22.45%
+  Cross            150 (25.86%)     9 (3.04%)     159         N/A
+  Pyth              89 (15.34%)    33 (11.15%)    122      16.80%
   ...
+
+--- Uncategorized Oracles ---
+Found 5 oracles that couldn't be categorized
+Details saved to unknown-oracles.json
 ```
+
+**Understanding the Metrics:**
+
+1. **Direct Count**: Number of times this oracle provider is used directly
+2. **Direct %**: Percentage out of all direct oracles (580 total)
+3. **Underlying Count**: Number of times used as underlying oracle in Cross adapters
+4. **Underlying %**: Percentage out of all underlying oracle calls (296 total)
+5. **Total Count**: Direct + Underlying
+6. **Combined %**: Total share of actual oracle usage (Cross excluded from calculation)
+
+**Why Cross Shows N/A:**
+- Cross is a wrapper/adapter, not an actual oracle provider
+- It's excluded from combined % to show true oracle provider market share
+- The underlying oracles (Chainlink, Pyth, etc.) get the attribution instead
 
 ---
 
@@ -167,10 +199,12 @@ npm run analyze-cross
 |------|-------------|--------|
 | `euler-oracles.json` | Complete scraped oracle data | JSON |
 | `euler-oracles.csv` | Complete scraped oracle data | CSV |
-| `vendor-analysis.json` | Vendor market share statistics | JSON |
-| `vendor-analysis.csv` | Vendor market share table | CSV |
+| `vendor-analysis.json` | Vendor market share with direct/underlying/combined stats | JSON |
+| `vendor-analysis.csv` | Vendor market share table (Direct %, Underlying %, Combined %) | CSV |
 | `cross-oracle-analysis.json` | Cross oracle composition details | JSON |
 | `cross-oracle-analysis.csv` | Cross oracle composition table | CSV |
+| `unknown-oracles.json` | Uncategorized oracles needing classification | JSON |
+| `unknown-oracles.csv` | Uncategorized oracles for review | CSV |
 
 ## Progress & Resume
 
@@ -200,6 +234,32 @@ Progress files are automatically deleted when the task completes successfully.
 - Up to 5 retry attempts per request
 - Stops after 5 consecutive failures
 - Resume by running the script again
+
+## Adding New Vendor Categories
+
+When you run `npm run analyze`, uncategorized oracles are saved to `unknown-oracles.json/csv`. To add them to the analysis:
+
+1. **Review uncategorized oracles:**
+   ```bash
+   cat unknown-oracles.json
+   # or open unknown-oracles.csv in Excel/Sheets
+   ```
+
+2. **Add to vendor normalization:**
+   Edit `analyze-vendors.js` and add to the `normalizeVendorName()` function:
+   ```javascript
+   if (providerLower.includes('newvendor')) return 'NewVendor';
+   ```
+
+3. **Add to target vendors list:**
+   Add the vendor to `TARGET_VENDORS` array at the top of `analyze-vendors.js`
+
+4. **Re-run analysis:**
+   ```bash
+   npm run analyze
+   ```
+
+The newly categorized oracles will now appear in the vendor analysis with their market share!
 
 ## Configuration
 
