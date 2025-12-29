@@ -1,5 +1,51 @@
-const fs = require("fs").promises;
+import { promises as fs } from "fs";
 
+// Types
+interface OracleData {
+  provider: string;
+  providerInfo: string;
+  base: string;
+  quote: string;
+  address: string;
+  addressLink: string;
+  page: number;
+  price?: string;
+  checks?: string;
+}
+
+interface CrossOracleDetail {
+  error?: string;
+  baseCrossName?: string;
+  crossQuoteName?: string;
+  crossAddress?: string;
+  base?: string;
+  quote?: string;
+}
+
+interface CrossOracleAnalysis {
+  details?: CrossOracleDetail[];
+}
+
+interface VendorCounts {
+  direct: number;
+  underlying: number;
+  total: number;
+}
+
+interface VendorStat {
+  vendor: string;
+  directCount: number;
+  underlyingCount: number;
+  totalCount: number;
+  directPercentage: number;
+  underlyingPercentage: number;
+  combinedPercentage: number | null;
+  directPercentageFormatted: string;
+  underlyingPercentageFormatted: string;
+  combinedPercentageFormatted: string;
+}
+
+// Configuration
 const TARGET_VENDORS = [
   "Chainlink",
   "RedStone",
@@ -14,7 +60,8 @@ const TARGET_VENDORS = [
   "Lido Fundamental",
 ];
 
-function normalizeVendorName(provider) {
+// Vendor normalization
+function normalizeVendorName(provider: string | undefined): string {
   if (!provider) return "Unknown";
 
   const providerLower = provider.toLowerCase();
@@ -34,22 +81,24 @@ function normalizeVendorName(provider) {
   if (providerLower.includes("fixed rate")) return "Fixed Rate";
   if (providerLower.includes("rate provider")) return "Rate Provider";
   if (providerLower.includes("lido fundamental")) return "Lido Fundamental";
-  if (providerLower.includes("unkown")) return "Unkown";
+  if (providerLower.includes("unknown")) return "Unknown";
 
   // If not matching any target vendor, return as Other
   return "Other";
 }
 
-async function analyzeVendors() {
+async function analyzeVendors(): Promise<void> {
   console.log("Reading oracle data...");
 
   // Read the scraped data
-  let oracles;
+  let oracles: OracleData[];
   try {
     const data = await fs.readFile("euler-oracles.json", "utf-8");
     oracles = JSON.parse(data);
   } catch (error) {
-    console.error("Error reading euler-oracles.json:", error.message);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error("Error reading euler-oracles.json:", errorMessage);
     console.error("Make sure you have run the scraper first: npm run scrape");
     process.exit(1);
   }
@@ -57,13 +106,13 @@ async function analyzeVendors() {
   console.log(`Found ${oracles.length} total oracle entries`);
 
   // Read Cross oracle analysis data if available
-  let crossOracleData = null;
+  let crossOracleData: CrossOracleAnalysis | null = null;
   try {
     const crossData = await fs.readFile("cross-oracle-analysis.json", "utf-8");
     crossOracleData = JSON.parse(crossData);
     console.log(
       `Found Cross oracle analysis data: ${
-        crossOracleData.details?.length || 0
+        crossOracleData?.details?.length || 0
       } Cross oracles analyzed`
     );
   } catch (error) {
@@ -72,24 +121,14 @@ async function analyzeVendors() {
     );
   }
 
-  // Filter out header rows or invalid entries
-  const validOracles = oracles.filter((oracle) => {
-    return (
-      oracle.provider &&
-      oracle.provider !== "Provider" &&
-      oracle.provider !==
-        "ProviderClearChainlinkCrossRedStoneRedStone PullPythChronicleLido FundamentalRate ProviderFixed RateMidasResolvPendleUnknownLidoMEV CapitalIdle"
-    );
-  });
-
-  console.log(`Analyzing ${validOracles.length} valid oracle entries`);
+  console.log(`Analyzing ${oracles.length} valid oracle entries`);
 
   // Count oracles by vendor (direct usage)
-  const vendorCounts = {};
-  const unknownOracles = [];
+  const vendorCounts: Record<string, number> = {};
+  const unknownOracles: OracleData[] = [];
 
-  validOracles.forEach((oracle) => {
-    const vendor = normalizeVendorName(oracle.provider);
+  oracles.forEach((oracle) => {
+    const vendor = normalizeVendorName(oracle.providerInfo);
     vendorCounts[vendor] = (vendorCounts[vendor] || 0) + 1;
 
     // Track unknown/other oracles for investigation
@@ -107,10 +146,10 @@ async function analyzeVendors() {
   });
 
   // Count underlying oracles from Cross adapters (indirect usage)
-  const underlyingVendorCounts = {};
+  const underlyingVendorCounts: Record<string, number> = {};
   let crossOraclesProcessed = 0;
 
-  if (crossOracleData && crossOracleData.details) {
+  if (crossOracleData?.details) {
     crossOracleData.details.forEach((cross) => {
       // Skip entries with errors or missing data
       if (cross.error || !cross.baseCrossName || !cross.crossQuoteName) {
@@ -136,7 +175,7 @@ async function analyzeVendors() {
   }
 
   // Calculate combined vendor counts
-  const combinedVendorCounts = {};
+  const combinedVendorCounts: Record<string, VendorCounts> = {};
 
   // Add direct counts
   Object.entries(vendorCounts).forEach(([vendor, count]) => {
@@ -150,8 +189,8 @@ async function analyzeVendors() {
   // Add underlying counts
   Object.entries(underlyingVendorCounts).forEach(([vendor, count]) => {
     if (combinedVendorCounts[vendor]) {
-      combinedVendorCounts[vendor].underlying = count;
-      combinedVendorCounts[vendor].total += count;
+      combinedVendorCounts[vendor]!.underlying = count;
+      combinedVendorCounts[vendor]!.total += count;
     } else {
       combinedVendorCounts[vendor] = {
         direct: 0,
@@ -162,12 +201,12 @@ async function analyzeVendors() {
   });
 
   // Calculate percentages and create stats array
-  const total = validOracles.length;
+  const total = oracles.length;
   const totalUnderlying = crossOraclesProcessed * 2; // Each cross oracle has 2 underlying oracles
   const crossDirectCount = vendorCounts["Cross"] || 0;
   // Exclude Cross from grand total since they're wrappers, not actual oracles
   const grandTotal = total - crossDirectCount + totalUnderlying;
-  const vendorStats = [];
+  const vendorStats: VendorStat[] = [];
 
   Object.entries(combinedVendorCounts).forEach(([vendor, counts]) => {
     const directPercentage = ((counts.direct / total) * 100).toFixed(2);
@@ -206,7 +245,7 @@ async function analyzeVendors() {
   // Prepare output
   const output = {
     summary: {
-      totalOracles: validOracles.length,
+      totalOracles: oracles.length,
       totalCrossOracles: crossOraclesProcessed,
       totalUnderlyingOracles: totalUnderlying,
       uniqueVendors: vendorStats.length,
@@ -369,7 +408,7 @@ async function analyzeVendors() {
   }
   console.log(
     `Other vendors: ${total - targetTotalDirect} oracles (${(
-      100 - targetPercentage
+      100 - parseFloat(targetPercentage)
     ).toFixed(2)}%)`
   );
 
@@ -379,7 +418,9 @@ async function analyzeVendors() {
     console.log(
       `Found ${unknownOracles.length} oracles that couldn't be categorized`
     );
-    console.log("Details saved to unknown-oracles.json and unknown-oracles.csv");
+    console.log(
+      "Details saved to unknown-oracles.json and unknown-oracles.csv"
+    );
     console.log("\nFirst 10 uncategorized oracles:");
     unknownOracles.slice(0, 10).forEach((oracle, idx) => {
       console.log(

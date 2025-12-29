@@ -1,15 +1,25 @@
 {
   "name": "euler-oracles-scraper",
-  "version": "1.0.0",
-  "description": "Scraper for Euler Finance oracle data",
-  "main": "scrape-euler-oracles.js",
+  "version": "2.0.0",
+  "description": "Scraper for Euler Finance oracle data - TypeScript + Bun",
+  "type": "module",
   "scripts": {
-    "scrape": "node scrape-euler-oracles.js",
-    "analyze": "node analyze-vendors.js",
-    "analyze-cross": "node analyze-cross-oracles.js"
+    "scrape": "bun run src/scrape-euler-oracles.ts",
+    "analyze": "bun run src/analyze-vendors.ts",
+    "analyze-cross": "bun run src/analyze-cross-oracles.ts",
+    "analyze-vaults": "bun run src/analyze-vault-vendors.ts",
+    "analyze-governors": "bun run src/analyze-vault-governors.ts",
+    "rank-governors": "bun run src/rank-governors-by-tvl.ts",
+    "filter-vaults": "bun run src/filter-vault-analysis.ts"
   },
   "dependencies": {
-    "puppeteer": "^21.6.1",
-    "ethers": "^6.9.0"
+    "dotenv": "^16.6.1",
+    "ethers": "^6.9.0",
+    "puppeteer": "^21.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "bun-types": "^1.0.0",
+    "typescript": "^5.3.0"
   }
 }

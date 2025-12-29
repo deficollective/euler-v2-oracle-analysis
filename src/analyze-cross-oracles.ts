@@ -1,6 +1,7 @@
-const fs = require('fs').promises;
-const fsSync = require('fs');
-const { ethers } = require('ethers');
+import 'dotenv/config';
+import { promises as fs } from 'fs';
+import { existsSync } from 'fs';
+import { ethers } from 'ethers';
 
 // RPC endpoint - you can change this to your preferred provider
 const RPC_URL = process.env.RPC_URL || 'https://eth.llamarpc.com';
@@ -22,11 +23,59 @@ const NAME_ABI = [
   'function name() view returns (string)'
 ];
 
-async function loadProgress() {
+// Interfaces
+interface OracleData {
+  provider?: string;
+  addressLink?: string;
+  base: string;
+  quote: string;
+  page: string;
+  fullAddress?: string;
+}
+
+interface Progress {
+  results: CrossOracleResult[];
+  completedAddresses: string[];
+  failedAddresses: Record<string, FailureInfo>;
+  lastUpdated?: string;
+}
+
+interface FailureInfo {
+  error: string;
+  attempts: number;
+  timestamp: string;
+}
+
+interface CrossOracleResult {
+  crossAddress: string;
+  base: string;
+  quote: string;
+  page: string;
+  baseCrossAddress?: string;
+  baseCrossName?: string;
+  crossQuoteAddress?: string;
+  crossQuoteName?: string;
+  resolvedNames: string[];
+  error?: string;
+}
+
+interface AnalysisOutput {
+  summary: {
+    totalCrossOracles: number;
+    successful: number;
+    failed: number;
+    analyzedAt: string;
+    rpcEndpoint: string;
+  };
+  underlyingOracleTypes: Record<string, number>;
+  details: CrossOracleResult[];
+}
+
+async function loadProgress(): Promise<Progress> {
   try {
-    if (fsSync.existsSync(PROGRESS_FILE)) {
+    if (existsSync(PROGRESS_FILE)) {
       const data = await fs.readFile(PROGRESS_FILE, 'utf-8');
-      const progress = JSON.parse(data);
+      const progress = JSON.parse(data) as Progress;
       console.log(`Found existing progress: ${progress.results.length} oracles analyzed`);
       return progress;
     }
@@ -36,8 +85,12 @@ async function loadProgress() {
   return { results: [], completedAddresses: [], failedAddresses: {} };
 }
 
-async function saveProgress(results, completedAddresses, failedAddresses) {
-  const progress = {
+async function saveProgress(
+  results: CrossOracleResult[],
+  completedAddresses: string[],
+  failedAddresses: Record<string, FailureInfo>
+): Promise<void> {
+  const progress: Progress = {
     results,
     completedAddresses,
     failedAddresses,
@@ -46,7 +99,7 @@ async function saveProgress(results, completedAddresses, failedAddresses) {
   await fs.writeFile(PROGRESS_FILE, JSON.stringify(progress, null, 2));
 }
 
-function isRateLimitError(error) {
+function isRateLimitError(error: Error): boolean {
   const errorMsg = error.message.toLowerCase();
   return errorMsg.includes('rate limit') ||
          errorMsg.includes('too many requests') ||
@@ -54,28 +107,41 @@ function isRateLimitError(error) {
          errorMsg.includes('exceeded');
 }
 
-async function sleep(ms) {
+async function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function getOracleName(provider, address, retryCount = 0) {
+async function getOracleName(
+  provider: ethers.JsonRpcProvider,
+  address: string,
+  retryCount: number = 0
+): Promise<string> {
   try {
     const contract = new ethers.Contract(address, NAME_ABI, provider);
-    const name = await contract.name();
+    const name = await contract.name?.() as string;
+    if (!name) {
+      return 'Unknown';
+    }
     return name;
   } catch (error) {
-    if (isRateLimitError(error) && retryCount < MAX_RATE_LIMIT_RETRIES) {
+    if (error instanceof Error && isRateLimitError(error) && retryCount < MAX_RATE_LIMIT_RETRIES) {
       const delay = RATE_LIMIT_DELAY * (retryCount + 1);
       console.log(`    Rate limited, waiting ${delay}ms before retry...`);
       await sleep(delay);
       return getOracleName(provider, address, retryCount + 1);
     }
-    console.log(`    Warning: Could not get name for ${address}: ${error.message}`);
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    console.log(`    Warning: Could not get name for ${address}: ${errorMsg}`);
     return 'Unknown';
   }
 }
 
-async function analyzeCrossOracle(provider, address, oracleData, retryCount = 0) {
+async function analyzeCrossOracle(
+  provider: ethers.JsonRpcProvider,
+  address: string,
+  oracleData: OracleData,
+  retryCount: number = 0
+): Promise<CrossOracleResult> {
   console.log(`\n  Analyzing Cross Oracle: ${address}`);
   console.log(`    Base: ${oracleData.base} | Quote: ${oracleData.quote}`);
 
@@ -84,13 +150,19 @@ async function analyzeCrossOracle(provider, address, oracleData, retryCount = 0)
 
     // Get the two underlying oracle addresses
     console.log('    Fetching oracleBaseCross...');
-    const baseCrossAddress = await crossContract.oracleBaseCross();
+    const baseCrossAddress = await crossContract.oracleBaseCross?.() as string;
+    if (!baseCrossAddress) {
+      throw new Error('oracleBaseCross returned undefined');
+    }
     console.log(`    → Base Cross Oracle: ${baseCrossAddress}`);
 
     await sleep(BASE_DELAY);
 
     console.log('    Fetching oracleCrossQuote...');
-    const crossQuoteAddress = await crossContract.oracleCrossQuote();
+    const crossQuoteAddress = await crossContract.oracleCrossQuote?.() as string;
+    if (!crossQuoteAddress) {
+      throw new Error('oracleCrossQuote returned undefined');
+    }
     console.log(`    → Cross Quote Oracle: ${crossQuoteAddress}`);
 
     await sleep(BASE_DELAY);
@@ -117,36 +189,38 @@ async function analyzeCrossOracle(provider, address, oracleData, retryCount = 0)
     };
 
   } catch (error) {
-    if (isRateLimitError(error) && retryCount < MAX_RETRIES) {
+    if (error instanceof Error && isRateLimitError(error) && retryCount < MAX_RETRIES) {
       const delay = RATE_LIMIT_DELAY * (retryCount + 1);
       console.log(`    Rate limited, waiting ${delay}ms before retry (attempt ${retryCount + 1}/${MAX_RETRIES})...`);
       await sleep(delay);
       return analyzeCrossOracle(provider, address, oracleData, retryCount + 1);
     }
 
-    console.error(`    ✗ Error analyzing ${address}:`, error.message);
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`    ✗ Error analyzing ${address}:`, errorMsg);
     return {
       crossAddress: address,
       base: oracleData.base,
       quote: oracleData.quote,
       page: oracleData.page,
-      error: error.message,
+      error: errorMsg,
       resolvedNames: []
     };
   }
 }
 
-async function analyzeCrossOracles() {
+async function analyzeCrossOracles(): Promise<void> {
   console.log('Analyzing Cross Oracles...\n');
   console.log(`Using RPC: ${RPC_URL}\n`);
 
   // Read the oracle data
-  let oracles;
+  let oracles: OracleData[];
   try {
     const data = await fs.readFile('euler-oracles.json', 'utf-8');
-    oracles = JSON.parse(data);
+    oracles = JSON.parse(data) as OracleData[];
   } catch (error) {
-    console.error('Error reading euler-oracles.json:', error.message);
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error reading euler-oracles.json:', errorMsg);
     console.error('Make sure you have run the scraper first: npm run scrape');
     process.exit(1);
   }
@@ -157,12 +231,12 @@ async function analyzeCrossOracles() {
     return providerLower.includes('cross') && oracle.addressLink;
   }).map(oracle => {
     // Extract full address from addressLink (e.g., "https://etherscan.io/address/0x123...")
-    const match = oracle.addressLink.match(/0x[a-fA-F0-9]{40}/);
+    const match = oracle.addressLink?.match(/0x[a-fA-F0-9]{40}/);
     return {
       ...oracle,
       fullAddress: match ? match[0] : null
     };
-  }).filter(oracle => oracle.fullAddress);
+  }).filter((oracle): oracle is OracleData & { fullAddress: string } => oracle.fullAddress !== null);
 
   console.log(`Found ${crossOracles.length} Cross oracles to analyze\n`);
 
@@ -196,7 +270,7 @@ async function analyzeCrossOracles() {
   const MAX_CONSECUTIVE_FAILURES = 5;
 
   for (let i = 0; i < remainingOracles.length; i++) {
-    const oracle = remainingOracles[i];
+    const oracle = remainingOracles[i]!;
     const address = oracle.fullAddress;
     const totalProcessed = completedAddresses.length + i + 1;
 
@@ -235,7 +309,8 @@ async function analyzeCrossOracles() {
       await saveProgress(results, completedAddresses, failedAddresses);
 
     } catch (error) {
-      console.error(`\nUnexpected error processing ${address}:`, error.message);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`\nUnexpected error processing ${address}:`, errorMsg);
       consecutiveFailures++;
 
       if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
@@ -252,7 +327,7 @@ async function analyzeCrossOracles() {
   }
 
   // Generate summary statistics
-  const nameCounts = {};
+  const nameCounts: Record<string, number> = {};
   results.forEach(result => {
     if (result.resolvedNames && result.resolvedNames.length > 0) {
       result.resolvedNames.forEach(name => {
@@ -262,7 +337,7 @@ async function analyzeCrossOracles() {
   });
 
   // Save results
-  const output = {
+  const output: AnalysisOutput = {
     summary: {
       totalCrossOracles: results.length,
       successful: results.filter(r => !r.error).length,
@@ -321,7 +396,9 @@ async function analyzeCrossOracles() {
     console.log('\n--- Failed Oracles ---');
     failedAddressList.slice(0, 10).forEach(addr => {
       const failure = failedAddresses[addr];
-      console.log(`  ${addr}: ${failure.error}`);
+      if (failure) {
+        console.log(`  ${addr}: ${failure.error}`);
+      }
     });
     if (failedAddressList.length > 10) {
       console.log(`  ... and ${failedAddressList.length - 10} more`);
