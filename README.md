@@ -1,4 +1,4 @@
-# Euler Oracle Dashboard
+# Euler V2 Oracle Analysis
 
 A comprehensive data pipeline for scraping, analyzing, and understanding the Euler Finance V2 oracle ecosystem on Ethereum.
 
