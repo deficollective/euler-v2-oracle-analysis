@@ -52,25 +52,6 @@ This project consists of seven main components:
 - **DIA API** - Token price data
 - **Etherscan API** - Contract verification and governor identification
 
-## Project Structure
-
-```
-.
-├── src/                             # TypeScript source files
-│   ├── scrape-euler-oracles.ts      # Web scraper
-│   ├── analyze-vendors.ts           # Vendor market share analyzer
-│   ├── analyze-cross-oracles.ts     # Cross oracle composition analyzer
-│   ├── analyze-vault-vendors.ts     # Vault TVL by vendor analyzer
-│   ├── analyze-router-governors.ts   # Governor identification analyzer
-│   ├── rank-governors-by-tvl.ts     # Governor TVL ranking
-│   ├── filter-vault-analysis.ts     # Vault TVL filter utility
-│   └── aggregate-vendors.ts         # Shared vendor aggregation module
-├── tsconfig.json                    # TypeScript configuration
-├── package.json                     # Dependencies and scripts
-├── .env.example                     # Environment variables template
-└── *.json / *.csv                  # Output data files (generated)
-```
-
 ## Data Pipeline Flow
 
 ```mermaid
@@ -215,7 +196,7 @@ cp .env.example .env
 
 ### 1. Scrape Oracle Data
 
-Scrapes all oracle data from the Euler Finance oracle directory (29 pages, ~580 oracles).
+Scrapes all oracle data from the [Euler Finance oracle directory](https://oracles.euler.finance/1/) (29 pages, ~580 oracles).
 
 ```bash
 bun run scrape
@@ -908,65 +889,11 @@ Edit `analyze-cross-oracles.js` to adjust:
 - `MAX_RETRIES` - Max retries per oracle (default: 3)
 - `MAX_CONSECUTIVE_FAILURES` - Stop after N failures (default: 5)
 
-## Data Structure
-
-### Oracle Entry
-
-```json
-{
-  "page": 1,
-  "provider": "Chainlink",
-  "providerInfo": "Chainlink",
-  "base": "WETH",
-  "quote": "USD",
-  "price": "$3,500.00",
-  "checks": "(7)",
-  "address": "0x1067...d84E1D",
-  "addressLink": "https://etherscan.io/address/0x10674C8C1aE2072d4a75FE83f1E159425fd84E1D"
-}
-```
-
-### Cross Oracle Analysis Entry
-
-```json
-{
-  "crossAddress": "0x02dd...9528D7",
-  "base": "wstETH",
-  "quote": "USD",
-  "page": 1,
-  "baseCrossAddress": "0x1234...5678",
-  "baseCrossName": "ChainlinkOracle",
-  "crossQuoteAddress": "0xabcd...ef01",
-  "crossQuoteName": "FixedRate",
-  "resolvedNames": ["ChainlinkOracle", "FixedRate"]
-}
-```
-
 ## Requirements
 
 - Bun 1.0+ (install: `curl -fsSL https://bun.sh/install | bash`)
 - Ethereum RPC endpoint for analysis
 - TypeScript 5.0+ (included in devDependencies)
-
-## Troubleshooting
-
-**Scraper timing out:**
-
-- The site may be blocking headless browsers
-- Check `debug-page-*.png` and `debug-page-*.html` for clues
-- Try increasing timeouts in `scrape-euler-oracles.js`
-
-**Cross analysis failing:**
-
-- Check RPC endpoint is working
-- Try using a different RPC (Infura, Alchemy, etc.)
-- Reduce `BASE_DELAY` if using a rate-limited RPC
-
-**Out of memory:**
-
-- Reduce batch sizes
-- Process data in chunks
-- Use streaming for large files
 
 ## License
 
@@ -974,9 +901,4 @@ MIT
 
 ## Contributing
 
-Pull requests welcome! Please ensure all scripts maintain:
-
-- Progress tracking and resume functionality
-- Proper error handling
-- Clear console output
-- CSV + JSON output formats
+Pull requests welcome!
