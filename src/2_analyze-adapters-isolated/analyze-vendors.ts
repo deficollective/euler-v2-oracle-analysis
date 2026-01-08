@@ -93,7 +93,10 @@ async function analyzeVendors(): Promise<void> {
   // Read the scraped data
   let oracles: OracleData[];
   try {
-    const data = await fs.readFile("euler-oracles.json", "utf-8");
+    const data = await fs.readFile(
+      "../scrape-euler-adapters/output/euler-oracles.json",
+      "utf-8"
+    );
     oracles = JSON.parse(data);
   } catch (error) {
     const errorMessage =
@@ -108,7 +111,10 @@ async function analyzeVendors(): Promise<void> {
   // Read Cross oracle analysis data if available
   let crossOracleData: CrossOracleAnalysis | null = null;
   try {
-    const crossData = await fs.readFile("cross-oracle-analysis.json", "utf-8");
+    const crossData = await fs.readFile(
+      "../analyze-cross-adapters/data/cross-oracle-analysis.json",
+      "utf-8"
+    );
     crossOracleData = JSON.parse(crossData);
     console.log(
       `Found Cross oracle analysis data: ${
@@ -259,7 +265,10 @@ async function analyzeVendors(): Promise<void> {
   };
 
   // Save to JSON
-  await fs.writeFile("vendor-analysis.json", JSON.stringify(output, null, 2));
+  await fs.writeFile(
+    "./data/vendor-analysis.json",
+    JSON.stringify(output, null, 2)
+  );
   console.log("✓ Saved to vendor-analysis.json");
 
   // Save to CSV
@@ -278,13 +287,13 @@ async function analyzeVendors(): Promise<void> {
       ].join(",");
     })
     .join("\n");
-  await fs.writeFile("vendor-analysis.csv", csvHeader + csvRows);
+  await fs.writeFile("./data/vendor-analysis.csv", csvHeader + csvRows);
   console.log("✓ Saved to vendor-analysis.csv");
 
   // Save unknown oracles list if any
   if (unknownOracles.length > 0) {
     await fs.writeFile(
-      "unknown-oracles.json",
+      "./data/unknown-oracles.json",
       JSON.stringify(unknownOracles, null, 2)
     );
     console.log(
@@ -308,7 +317,7 @@ async function analyzeVendors(): Promise<void> {
       })
       .join("\n");
     await fs.writeFile(
-      "unknown-oracles.csv",
+      "./data/unknown-oracles.csv",
       unknownCsvHeader + unknownCsvRows
     );
     console.log("✓ Saved to unknown-oracles.csv");

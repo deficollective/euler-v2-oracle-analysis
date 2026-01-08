@@ -284,16 +284,22 @@ async function scrapeEulerOracles(): Promise<void> {
     console.log(`\nTotal oracles scraped: ${allOracles.length}`);
     console.log(`Pages completed: ${completedPages.length}/${TOTAL_PAGES}`);
 
+    // Filter out the specific provider
+    const filteredOracles = allOracles.filter(
+      (oracle) => oracle.provider !== "ProviderClearChainlinkCrossRedStoneRedStone PullPythChronicleLido FundamentalRate ProviderFixed RateMidasResolvPendleUnknownLidoMEV CapitalIdle"
+    );
+    console.log(`Filtered out ${allOracles.length - filteredOracles.length} oracles with provider "ProviderClearChainlinkCrossRedStoneRedStone PullPythChronicleLido FundamentalRate ProviderFixed RateMidasResolvPendleUnknownLidoMEV CapitalIdle"`);
+
     // Save to JSON file
-    const jsonOutput = JSON.stringify(allOracles, null, 2);
+    const jsonOutput = JSON.stringify(filteredOracles, null, 2);
     await fs.writeFile("euler-oracles.json", jsonOutput);
     console.log("✓ Saved to euler-oracles.json");
 
     // Save to CSV file
-    if (allOracles.length > 0) {
+    if (filteredOracles.length > 0) {
       const csvHeader =
         "Page,Provider,Provider Info,Base,Quote,Price,Checks,Address,Address Link\n";
-      const csvRows = allOracles
+      const csvRows = filteredOracles
         .map((oracle) => {
           return [
             oracle.page,
@@ -318,7 +324,7 @@ async function scrapeEulerOracles(): Promise<void> {
     // Print summary
     console.log("\n--- Summary ---");
     const providerCounts: Record<string, number> = {};
-    allOracles.forEach((oracle) => {
+    filteredOracles.forEach((oracle) => {
       providerCounts[oracle.provider] =
         (providerCounts[oracle.provider] || 0) + 1;
     });

@@ -44,7 +44,7 @@ interface AnalysisResult {
   generatedAt: string;
 }
 
-const INPUT_FILE = "./vault-vendor-analysis.json";
+const INPUT_FILE = "./src/3_analyze-euler-vaults/output/vault-vendor-analysis.json";
 const OUTPUT_FILE = "./vault-vendor-analysis-filtered.json";
 const OUTPUT_CSV = "./vault-vendor-analysis-filtered.csv";
 

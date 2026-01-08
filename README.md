@@ -2,7 +2,35 @@
 
 A comprehensive data pipeline for scraping, analyzing, and understanding the Euler Finance V2 oracle ecosystem on Ethereum.
 
+Centralization Vectors in the Euler V2 lending market are on several layers. First of all, most of the vaults are upgradeable (but user can also deploy a non-upgradeable vault). Upgradeability control of vaults lie with the Euler DAO. Secondly, each vault has a governor that can install a router, which obtains price quotes to determine LTV for assessing the health of positions using the vault. This vault-router connection is immutable, but the router has a governor role as well. This router governor has the right to change the price feeds (wrapped in an adpater).
+
+So user interacting with a vault are trusting the vault governor (for risk params), the router governor (for selection of vendors) and the underlying vendors used in the oracle adapter (Chainlink, Redstone, Pyth etc.) for fair market prices.
+
+This repository contains code to retrieve the overall exposure to the different oracle vendors ranked by TVL (3_analyze-euler_vaults), the governors of the routers (4_analyze-router-governors) and rank them by TVL (5_rank-router-governors-by-tvl).
+
+Scripts 1 and 2 are necessary for retrieving the necessary data to run 3-5.
+
 ## Overview
+
+This project consists of the following modules separated in folders.
+
+(The number at the beginning of the folder states the rank within the hierarchy of scripts, script 3_analyze-euler-vaults can only be executed after script 1 and script 2.)
+
+### 1_scrape-euler-adapters
+
+This script allows to fetch the labels from adapters that are known by the Euler Ecosystem.
+
+### 2_analyze-adapters
+
+This script allows to get an overview over the market share of the different vendors in the Euler Ecosystem retrieved by 1_scrape-euler-adapters.
+
+### 2_analyze-cross-adapters
+
+Some adapters are a composition of other adapters, which are referred as "cross". This script analyses the underlying adapters which are used by the cross-adapter.
+
+### 3_analzye-euler-vaults
+
+Most elaborate script, it is split into 4 sub-scripts that also can be executed in isolation (if the rank higher script was executed once and the data is stored). This module goes fetches all deployed routers and vaults from on-chain events emitted by the two factories. Then it queries all the configured adapters to each router. Additionally, it fetches the balance of the vault asset and its price. Lastly it groups the vaults by oracle vendors and ranks it by TVL.
 
 This project consists of seven main components:
 
@@ -33,7 +61,7 @@ This project consists of seven main components:
 │   ├── analyze-vendors.ts           # Vendor market share analyzer
 │   ├── analyze-cross-oracles.ts     # Cross oracle composition analyzer
 │   ├── analyze-vault-vendors.ts     # Vault TVL by vendor analyzer
-│   ├── analyze-vault-governors.ts   # Governor identification analyzer
+│   ├── analyze-router-governors.ts   # Governor identification analyzer
 │   ├── rank-governors-by-tvl.ts     # Governor TVL ranking
 │   ├── filter-vault-analysis.ts     # Vault TVL filter utility
 │   └── aggregate-vendors.ts         # Shared vendor aggregation module
@@ -55,13 +83,13 @@ flowchart TB
     Etherscan[Etherscan API<br/>Contract Info]
 
     %% Scripts
-    S1[scrape-euler-oracles.ts]
-    S2[analyze-vendors.ts]
-    S3[analyze-cross-oracles.ts]
-    S4[analyze-vault-vendors.ts]
-    S5[analyze-vault-governors.ts]
-    S6[rank-governors-by-tvl.ts]
-    S7[filter-vault-analysis.ts]
+    S1[scrape-euler-adapters]
+    S2[analyze-adapters-isolated]
+    S3[analyze-cross-adapters]
+    S4[analyze-euler-vaults]
+    S5[analyze-router-governors]
+    S6[rank-governors-by-tvl]
+    S7[filter-vault-analysis]
 
     %% Terminal Output Titles
     T1["💬 Scraping Euler Oracles"]
@@ -141,6 +169,7 @@ flowchart TB
 ```
 
 **Legend:**
+
 - 🔵 **Blue boxes**: TypeScript scripts
 - 🟡 **Gold boxes**: Terminal output titles (console display)
 - 🟢 **Green cylinders**: Output data files (JSON/CSV)
@@ -150,6 +179,7 @@ flowchart TB
 - **Dotted arrows**: Progress/state files and terminal displays
 
 **Key Insights:**
+
 1. **Linear Core Pipeline**: Steps 1-4 must run in sequence
 2. **Parallel Analysis**: Steps 2-3 can run in parallel after step 1
 3. **Governor Analysis Branch**: Steps 5-6 form a separate analysis chain
@@ -158,6 +188,7 @@ flowchart TB
 6. **Progress Tracking**: Orange boxes enable resumable execution if interrupted
 
 **⚠️ Important Filters (Annotated on Arrows):**
+
 - **S3 (Cross Oracle Analyzer)**: Only processes oracles with `provider='Cross'`
 - **S4 → O4 (Vault TVL Analysis)**: Excludes ~67% of vaults with TVL = $0 (empty vaults)
 - **S5 → O6 (Governor Analysis)**: Skips vaults with zero-address routers (escrow vaults) and non-compliant routers
@@ -680,27 +711,27 @@ bun run filter-vaults
 
 ## Output Files
 
-| File                         | Description                                                    | Format |
-| ---------------------------- | -------------------------------------------------------------- | ------ |
-| `euler-oracles.json`         | Complete scraped oracle data                                   | JSON   |
-| `euler-oracles.csv`          | Complete scraped oracle data                                   | CSV    |
-| `vendor-analysis.json`       | Vendor market share with direct/underlying/combined stats      | JSON   |
-| `vendor-analysis.csv`        | Vendor market share table (Direct %, Underlying %, Combined %) | CSV    |
-| `cross-oracle-analysis.json` | Cross oracle composition details                               | JSON   |
-| `cross-oracle-analysis.csv`  | Cross oracle composition table                                 | CSV    |
-| `vault-vendor-analysis.json`                     | TVL breakdown by oracle vendor across all vaults                  | JSON   |
-| `vault-vendor-analysis.csv`                      | TVL by vendor in spreadsheet format                               | CSV    |
-| `vault-vendor-and-governor.json`                 | Vault data enhanced with governor information                     | JSON   |
-| `vault-vendor-and-governor-analysis.json`        | TVL breakdown by vendor (with governor data)                      | JSON   |
-| `vault-vendor-and-governor-analysis.csv`         | TVL by vendor with governors in spreadsheet format                | CSV    |
-| `governor-tvl-ranking.json`                      | Ranking of governors by total TVL controlled                      | JSON   |
-| `governor-tvl-ranking.csv`                       | Governor ranking in spreadsheet format                            | CSV    |
-| `vault-vendor-analysis-filtered.json`            | Filtered vault analysis (TVL > threshold)                         | JSON   |
-| `vault-vendor-analysis-filtered.csv`             | Filtered analysis in spreadsheet format                           | CSV    |
-| `router-deployments.json`                        | Cached router addresses and deployment blocks                     | JSON   |
-| `vault-deployments.json`                         | Cached vault addresses and deployment blocks                      | JSON   |
-| `unknown-oracles.json`                           | Uncategorized oracles needing classification                      | JSON   |
-| `unknown-oracles.csv`                            | Uncategorized oracles for review                                  | CSV    |
+| File                                      | Description                                                    | Format |
+| ----------------------------------------- | -------------------------------------------------------------- | ------ |
+| `euler-oracles.json`                      | Complete scraped oracle data                                   | JSON   |
+| `euler-oracles.csv`                       | Complete scraped oracle data                                   | CSV    |
+| `vendor-analysis.json`                    | Vendor market share with direct/underlying/combined stats      | JSON   |
+| `vendor-analysis.csv`                     | Vendor market share table (Direct %, Underlying %, Combined %) | CSV    |
+| `cross-oracle-analysis.json`              | Cross oracle composition details                               | JSON   |
+| `cross-oracle-analysis.csv`               | Cross oracle composition table                                 | CSV    |
+| `vault-vendor-analysis.json`              | TVL breakdown by oracle vendor across all vaults               | JSON   |
+| `vault-vendor-analysis.csv`               | TVL by vendor in spreadsheet format                            | CSV    |
+| `vault-vendor-and-governor.json`          | Vault data enhanced with governor information                  | JSON   |
+| `vault-vendor-and-governor-analysis.json` | TVL breakdown by vendor (with governor data)                   | JSON   |
+| `vault-vendor-and-governor-analysis.csv`  | TVL by vendor with governors in spreadsheet format             | CSV    |
+| `governor-tvl-ranking.json`               | Ranking of governors by total TVL controlled                   | JSON   |
+| `governor-tvl-ranking.csv`                | Governor ranking in spreadsheet format                         | CSV    |
+| `vault-vendor-analysis-filtered.json`     | Filtered vault analysis (TVL > threshold)                      | JSON   |
+| `vault-vendor-analysis-filtered.csv`      | Filtered analysis in spreadsheet format                        | CSV    |
+| `router-deployments.json`                 | Cached router addresses and deployment blocks                  | JSON   |
+| `vault-deployments.json`                  | Cached vault addresses and deployment blocks                   | JSON   |
+| `unknown-oracles.json`                    | Uncategorized oracles needing classification                   | JSON   |
+| `unknown-oracles.csv`                     | Uncategorized oracles for review                               | CSV    |
 
 ## Progress & Resume
 

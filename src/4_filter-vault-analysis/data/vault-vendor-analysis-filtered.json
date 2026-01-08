@@ -1,0 +1,380 @@
+{
+  "totalTVL": 736064386.6039345,
+  "uniqueVaults": 40,
+  "vendorStats": [
+    {
+      "vendor": "Fixed Rate",
+      "totalUSD": 462652174.5626848,
+      "percentage": 62.854851149269244,
+      "vaultCount": 6,
+      "vaultPercentage": 15,
+      "vaults": [
+        {
+          "address": "0xe1Ce9AF672f8854845E5474400B6ddC7AE458a10",
+          "asset": "RLUSD",
+          "value": 996489.0460915342
+        },
+        {
+          "address": "0xF037eeEBA7729c39114B9711c75FbccCa4A343C8",
+          "asset": "USD0++",
+          "value": 459383869.90753376
+        },
+        {
+          "address": "0xd001f0a15D272542687b2677BA627f48A4333b5d",
+          "asset": "USD0",
+          "value": 1023745.1848451933
+        },
+        {
+          "address": "0x328646cdfBaD730432620d845B8F5A2f7D786C01",
+          "asset": "USDtb",
+          "value": 360011.1424385854
+        },
+        {
+          "address": "0xf1BA8c5Ca5aB011d06f31e64DaD313d204aCb9Eb",
+          "asset": "xUSD",
+          "value": 404628.1027981722
+        },
+        {
+          "address": "0x2a356443FeE07703266066c6Bb1B11b82d8246AD",
+          "asset": "USDC",
+          "value": 483431.17897746037
+        }
+      ]
+    },
+    {
+      "vendor": "Chainlink",
+      "totalUSD": 260083549.75747648,
+      "percentage": 35.334347713445844,
+      "vaultCount": 20,
+      "vaultPercentage": 50,
+      "vaults": [
+        {
+          "address": "0xD8b27CF359b7D15710a5BE299AF6e7Bf904984C2",
+          "asset": "WETH",
+          "value": 1171042.7325031876
+        },
+        {
+          "address": "0xbC4B4AC47582c3E38Ce5940B80Da65401F4628f1",
+          "asset": "wstETH",
+          "value": 2069925.542018011
+        },
+        {
+          "address": "0x797DD80692c3b2dAdabCe8e30C07fDE5307D48a9",
+          "asset": "USDC",
+          "value": 740132.0125616466
+        },
+        {
+          "address": "0x313603FA690301b0CaeEf8069c065862f9162162",
+          "asset": "USDT",
+          "value": 277300.00352672033
+        },
+        {
+          "address": "0xe846ca062aB869b66aE8DcD811973f628BA82eAf",
+          "asset": "weETH",
+          "value": 457037.454268682
+        },
+        {
+          "address": "0x998D761eC1BAdaCeb064624cc3A1d37A46C88bA4",
+          "asset": "WBTC",
+          "value": 750704.234878944
+        },
+        {
+          "address": "0x056f3a2E41d2778D3a0c0714439c53af2987718E",
+          "asset": "cbBTC",
+          "value": 227831.95806645727
+        },
+        {
+          "address": "0xcBC9B61177444A793B85442D3a953B90f6170b7D",
+          "asset": "USDC",
+          "value": 223965.4988889776
+        },
+        {
+          "address": "0xe0a80d35bB6618CBA260120b279d357978c42BCE",
+          "asset": "USDC",
+          "value": 1054082.9070718242
+        },
+        {
+          "address": "0x7c280DBDEf569e96c7919251bD2B0edF0734C5A8",
+          "asset": "USDT",
+          "value": 755299.6643258682
+        },
+        {
+          "address": "0xe1Ce9AF672f8854845E5474400B6ddC7AE458a10",
+          "asset": "RLUSD",
+          "value": 996489.0460915342
+        },
+        {
+          "address": "0x1924D7fab80d0623f0836Cbf5258a7fa734EE9D9",
+          "asset": "rsETH",
+          "value": 425158.25809400243
+        },
+        {
+          "address": "0xA28C23a459fF8773EB4dBe0e7250d93F79F1Fe2B",
+          "asset": "tETH",
+          "value": 552031.1248030314
+        },
+        {
+          "address": "0x5A96128c18018a2cEf539f46Bbed037DAD3cAAe8",
+          "asset": "XAUt",
+          "value": 769574.4125753343
+        },
+        {
+          "address": "0x20622fcD4476fbc9d5Ef36EBd371307a56d9028c",
+          "asset": "frxUSD",
+          "value": 1003702.2048863848
+        },
+        {
+          "address": "0xaF5372792a29dC6b296d6FFD4AA3386aff8f9BB2",
+          "asset": "RLUSD",
+          "value": 95490562.29783824
+        },
+        {
+          "address": "0x9bD52F2805c6aF014132874124686e7b248c2Cbb",
+          "asset": "USDC",
+          "value": 17362002.330817465
+        },
+        {
+          "address": "0x2e6Dff8907aFdA5D62A278e21B2e65c8595D746E",
+          "asset": "WETH",
+          "value": 422235.8449351628
+        },
+        {
+          "address": "0xba98fC35C9dfd69178AD5dcE9FA29c64554783b5",
+          "asset": "XYZ",
+          "value": 110272636.71343638
+        },
+        {
+          "address": "0xAB2726DAf820Aa9270D14Db9B18c8d187cbF2f30",
+          "asset": "USDC",
+          "value": 25061835.515888624
+        }
+      ]
+    },
+    {
+      "vendor": "Other",
+      "totalUSD": 10639504.36932998,
+      "percentage": 1.4454583814900612,
+      "vaultCount": 7,
+      "vaultPercentage": 17.5,
+      "vaults": [
+        {
+          "address": "0xbC4B4AC47582c3E38Ce5940B80Da65401F4628f1",
+          "asset": "wstETH",
+          "value": 2069925.542018011
+        },
+        {
+          "address": "0x998D761eC1BAdaCeb064624cc3A1d37A46C88bA4",
+          "asset": "WBTC",
+          "value": 750704.234878944
+        },
+        {
+          "address": "0x1924D7fab80d0623f0836Cbf5258a7fa734EE9D9",
+          "asset": "rsETH",
+          "value": 425158.25809400243
+        },
+        {
+          "address": "0x1ab9e92CFdE84f38868753d30fFc43F812B803C5",
+          "asset": "RZR",
+          "value": 781631.8458880908
+        },
+        {
+          "address": "0xf1BA8c5Ca5aB011d06f31e64DaD313d204aCb9Eb",
+          "asset": "xUSD",
+          "value": 404628.1027981722
+        },
+        {
+          "address": "0xf8C84D6A51Cf24c9AC79ABcE2823255FFA871145",
+          "asset": "mHYPER",
+          "value": 244322.34009891667
+        },
+        {
+          "address": "0x85F948273BDc705BaCD29BF5A2c87067E8d9d63a",
+          "asset": "fxSAVE",
+          "value": 5963134.045553843
+        }
+      ]
+    },
+    {
+      "vendor": "Unknown",
+      "totalUSD": 6648546.312077966,
+      "percentage": 0.9032560782831967,
+      "vaultCount": 7,
+      "vaultPercentage": 17.5,
+      "vaults": [
+        {
+          "address": "0xF6E2EfDF175e7a91c8847dade42f2d39A9aE57D4",
+          "asset": "wstETH",
+          "value": 408259.397367204
+        },
+        {
+          "address": "0xE3ea69f8661FFac04E269f99C14ba73e2Bb10633",
+          "asset": "ezETH",
+          "value": 601939.9527773571
+        },
+        {
+          "address": "0xe0a80d35bB6618CBA260120b279d357978c42BCE",
+          "asset": "USDC",
+          "value": 1054082.9070718242
+        },
+        {
+          "address": "0x7c280DBDEf569e96c7919251bD2B0edF0734C5A8",
+          "asset": "USDT",
+          "value": 755299.6643258682
+        },
+        {
+          "address": "0x2daCa71Cb58285212Dc05D65Cfd4f59A82BC4cF6",
+          "asset": "USDe",
+          "value": 299842.6316714889
+        },
+        {
+          "address": "0xA28C23a459fF8773EB4dBe0e7250d93F79F1Fe2B",
+          "asset": "tETH",
+          "value": 552031.1248030314
+        },
+        {
+          "address": "0x4CaF2f4847448b7103922fb9b926E80782dcDC6d",
+          "asset": "EUL",
+          "value": 2977090.6340611917
+        }
+      ]
+    },
+    {
+      "vendor": "Pyth",
+      "totalUSD": 2966431.593578072,
+      "percentage": 0.40301251460685944,
+      "vaultCount": 6,
+      "vaultPercentage": 15,
+      "vaults": [
+        {
+          "address": "0x8dDE384022D4dE1D6C67891a8865f551c444dc4C",
+          "asset": "sUSDe",
+          "value": 288358.0736297187
+        },
+        {
+          "address": "0xe0a80d35bB6618CBA260120b279d357978c42BCE",
+          "asset": "USDC",
+          "value": 1054082.9070718242
+        },
+        {
+          "address": "0x7c280DBDEf569e96c7919251bD2B0edF0734C5A8",
+          "asset": "USDT",
+          "value": 755299.6643258682
+        },
+        {
+          "address": "0x2daCa71Cb58285212Dc05D65Cfd4f59A82BC4cF6",
+          "asset": "USDe",
+          "value": 299842.6316714889
+        },
+        {
+          "address": "0xc6137BC1378c2396051e06417704d31615F77Cb9",
+          "asset": "USDC",
+          "value": 244758.6305433945
+        },
+        {
+          "address": "0x783431B152C3e83B0c4dCD602E62a2C55d442F9B",
+          "asset": "W",
+          "value": 324089.68633577746
+        }
+      ]
+    },
+    {
+      "vendor": "Cross",
+      "totalUSD": 2268479.18002688,
+      "percentage": 0.30819031885148324,
+      "vaultCount": 5,
+      "vaultPercentage": 12.5,
+      "vaults": [
+        {
+          "address": "0xe846ca062aB869b66aE8DcD811973f628BA82eAf",
+          "asset": "weETH",
+          "value": 457037.454268682
+        },
+        {
+          "address": "0x056f3a2E41d2778D3a0c0714439c53af2987718E",
+          "asset": "cbBTC",
+          "value": 227831.95806645727
+        },
+        {
+          "address": "0xE88e44C2C7dfc9bcb86e380d29375ccD6cd85406",
+          "asset": "ezETH",
+          "value": 428966.4029330132
+        },
+        {
+          "address": "0xA28C23a459fF8773EB4dBe0e7250d93F79F1Fe2B",
+          "asset": "tETH",
+          "value": 552031.1248030314
+        },
+        {
+          "address": "0xaabc07A47D2a63a9b06A7924a0780c2F3cAE7bf9",
+          "asset": "PT-cUSDO-20NOV2025",
+          "value": 602612.2399556963
+        }
+      ]
+    },
+    {
+      "vendor": "Rate Provider",
+      "totalUSD": 931140.2468640613,
+      "percentage": 0.12650255382686978,
+      "vaultCount": 2,
+      "vaultPercentage": 5,
+      "vaults": [
+        {
+          "address": "0xc2c4aBae84fbb5b7bAAB52301A924b1F986C66bd",
+          "asset": "WETH",
+          "value": 553314.0865968158
+        },
+        {
+          "address": "0x46BC453666BA11b4b08B0804E49A9D797546ee7D",
+          "asset": "pufETH",
+          "value": 377826.16026724555
+        }
+      ]
+    },
+    {
+      "vendor": "RedStone",
+      "totalUSD": 299842.6316714889,
+      "percentage": 0.04073592434690498,
+      "vaultCount": 1,
+      "vaultPercentage": 2.5,
+      "vaults": [
+        {
+          "address": "0x2daCa71Cb58285212Dc05D65Cfd4f59A82BC4cF6",
+          "asset": "USDe",
+          "value": 299842.6316714889
+        }
+      ]
+    },
+    {
+      "vendor": "Midas",
+      "totalUSD": 229005.20218508304,
+      "percentage": 0.03111211550957802,
+      "vaultCount": 1,
+      "vaultPercentage": 2.5,
+      "vaults": [
+        {
+          "address": "0x3F7CcadEd39Fd9D06Eb0498ABEb7EAAB569E79Ad",
+          "asset": "mMEV",
+          "value": 229005.20218508304
+        }
+      ]
+    },
+    {
+      "vendor": "Chronicle",
+      "totalUSD": 227831.95806645727,
+      "percentage": 0.03095272128537993,
+      "vaultCount": 1,
+      "vaultPercentage": 2.5,
+      "vaults": [
+        {
+          "address": "0x056f3a2E41d2778D3a0c0714439c53af2987718E",
+          "asset": "cbBTC",
+          "value": 227831.95806645727
+        }
+      ]
+    }
+  ],
+  "filterCriteria": {
+    "minValueUSD": 200000
+  },
+  "generatedAt": "2025-12-23T14:02:01.550Z"
+}

@@ -9,32 +9,6 @@ dist/
 *.tsbuildinfo
 tsconfig.tsbuildinfo
 
-# Scraped data files
-euler-oracles.json
-euler-oracles.csv
-scrape-progress.json
-cross-oracle-progress.json
-vault-vendor-progress.json
-router-deployments.json
-vault-deployments.json
-
-# Analysis output files
-vendor-analysis.json
-vendor-analysis.csv
-cross-oracle-analysis.json
-cross-oracle-analysis.csv
-unknown-oracles.json
-unknown-oracles.csv
-vault-vendor-analysis.json
-vault-vendor-analysis.csv
-vault-vendor-analysis-filtered.json
-vault-vendor-analysis-filtered.csv
-vault-vendor-and-governor.json
-vault-vendor-and-governor-analysis.json
-vault-vendor-and-governor-analysis.csv
-governor-tvl-ranking.json
-governor-tvl-ranking.csv
-
 # Debug files
 debug-page*.png
 debug-page*.html

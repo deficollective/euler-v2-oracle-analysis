@@ -4,13 +4,17 @@
   "description": "Scraper for Euler Finance oracle data - TypeScript + Bun",
   "type": "module",
   "scripts": {
-    "scrape": "bun run src/scrape-euler-oracles.ts",
-    "analyze": "bun run src/analyze-vendors.ts",
-    "analyze-cross": "bun run src/analyze-cross-oracles.ts",
-    "analyze-vaults": "bun run src/analyze-vault-vendors.ts",
-    "analyze-governors": "bun run src/analyze-vault-governors.ts",
-    "rank-governors": "bun run src/rank-governors-by-tvl.ts",
-    "filter-vaults": "bun run src/filter-vault-analysis.ts"
+    "scrape": "bun run src/1_scrape-euler-adapters/scrape-euler-oracles.ts",
+    "analyze-vendors-isolated": "bun run src/2_analyze-adapters-isolated/analyze-vendors.ts",
+    "analyze-cross-adapters": "bun run src/2_analyze-cross-adapters/analyze-cross-oracles.ts",
+    "analyze-vaults": "bun run src/3_analyze-euler-vaults/index.ts",
+    "analyze-vaults:1-routers": "bun run src/3_analyze-euler-vaults/steps/1-fetch-routers.ts",
+    "analyze-vaults:2-vaults": "bun run src/3_analyze-euler-vaults/steps/2-fetch-vaults.ts",
+    "analyze-vaults:3-balances": "bun run src/3_analyze-euler-vaults/steps/3-fetch-balances.ts",
+    "analyze-vaults:4-aggregate": "bun run src/3_analyze-euler-vaults/steps/4-aggregate-vendors.ts",
+    "analyze-router-governors": "bun run src/4_analyze-router-governors/analyze-router-governors.ts",
+    "rank-governors": "bun run src/5_rank-router-governors-by-tvl/rank-governors-by-tvl.ts",
+    "filter-vaults": "bun run src/4_filter-vault-analysis/filter-vault-analysis.ts"
   },
   "dependencies": {
     "dotenv": "^16.6.1",

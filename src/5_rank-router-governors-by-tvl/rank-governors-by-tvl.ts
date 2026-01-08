@@ -1,10 +1,11 @@
 import { promises as fs } from "fs";
 import { existsSync } from "fs";
-import type { Progress } from "./aggregate-vendors.js";
+import type { Progress } from "../4_filter-vault-analysis/aggregate-vendors.js";
 
-const INPUT_FILE = "vault-vendor-and-governor.json";
-const OUTPUT_FILE = "governor-tvl-ranking.json";
-const OUTPUT_CSV = "governor-tvl-ranking.csv";
+const INPUT_FILE =
+  "../analyze-router-governors/data/vault-vendor-and-governor.json";
+const OUTPUT_FILE = "./data/governor-tvl-ranking.json";
+const OUTPUT_CSV = "./data/governor-tvl-ranking.csv";
 
 interface GovernorTVL {
   address: string;
@@ -32,7 +33,7 @@ async function main() {
   // Check if input file exists
   if (!existsSync(INPUT_FILE)) {
     console.error(`❌ Error: ${INPUT_FILE} not found`);
-    console.error("Please run analyze-vault-governors.ts first");
+    console.error("Please run analyze-router-governors.ts first");
     process.exit(1);
   }
 

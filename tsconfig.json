@@ -28,6 +28,10 @@
     "resolveJsonModule": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "src/4_filter-vault-analysis/aggregate-vendors.ts",
+    "archive/analyze-vault-vendors.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

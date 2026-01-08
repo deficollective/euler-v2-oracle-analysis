@@ -2,13 +2,17 @@ import "dotenv/config";
 import { promises as fs } from "fs";
 import { existsSync } from "fs";
 import { ethers } from "ethers";
-import { groupByVendor, Progress, VaultInfo } from "./aggregate-vendors.js";
+import {
+  groupByVendor,
+  Progress,
+} from "../4_filter-vault-analysis/aggregate-vendors.js";
 
 // Configuration
 const RPC_URL = process.env.RPC_URL || "https://eth.llamarpc.com";
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
-const INPUT_FILE = "vault-vendor-progress.json";
-const OUTPUT_FILE = "vault-vendor-and-governor.json";
+const INPUT_FILE =
+  "src/3_analyze-euler-vaults/output/vault-vendor-progress.json";
+const OUTPUT_FILE = "./data/vault-vendor-and-governor.json";
 
 // Router ABI - only need governor() function
 const ROUTER_ABI = ["function governor() external view returns (address)"];
@@ -246,8 +250,8 @@ async function main(): Promise<void> {
   console.log("\n");
   await groupByVendor(
     progress,
-    "vault-vendor-and-governor-analysis.json",
-    "vault-vendor-and-governor-analysis.csv"
+    "./data/vault-vendor-and-governor-analysis.json",
+    "./data/vault-vendor-and-governor-analysis.csv"
   );
 }
 
